@@ -22,19 +22,17 @@ const numberButtons = Array.from(document.querySelectorAll('.number'));
 const displayBottom = document.querySelector('#display-bottom');
 const displayTop = document.querySelector('#display-top');
 const deleteButton = document.querySelector('#del');
-// const addButton = document.querySelector('#add');
-// const subtractButton = document.querySelector('#subtract');
-// const multiplyButton = document.querySelector('#multiply');
-// const divideButton = document.querySelector('#divide');
 const arithmeticButtons = Array.from(document.querySelectorAll('.arithmetic'));
 const equalButton = document.querySelector('#equal');
 const clearButton = document.querySelector('#clear');
+const dotButton = document.querySelector('#dot');
 
 numberButtons.forEach(button => button.addEventListener('click', addToDisplay));
 arithmeticButtons.forEach(button => button.addEventListener('click', addOperator));
 deleteButton.addEventListener('click', deleteFromDisplay);
 equalButton.addEventListener('click', operate);
 clearButton.addEventListener('click', clearScreen);
+dotButton.addEventListener('click', addDecimal);
 
 function addToDisplay() {
     displayBottom.innerText += this.innerText;
@@ -102,6 +100,9 @@ function operate() {
 }
 
 function displayResult(result) {
+    if (result.toString().length > 10) {
+        result = roundOff(result);
+    }
     displayBottom.innerText = result;
     displayTop.innerText = result;
 }
@@ -110,4 +111,26 @@ function clearScreen() {
     displayBottom.innerText = '';
     displayTop.innerText = '';
     activateButtons();
+}
+
+function addDecimal() {
+    let displayTextBottom = displayBottom.innerText;
+    if (displayTextBottom.indexOf('.') === -1) {
+        displayBottom.innerText += '.';
+    }
+}
+
+function roundOff(result) {
+    let resultString = result.toString();
+    if (resultString.indexOf('e') > -1) {
+        let numberPart = resultString.substring(0, resultString.indexOf('e'));
+        return roundd(numberPart).toString() + resultString.substring(resultString.indexOf('e'));
+    }
+    return roundd(resultString);
+}
+
+function roundd(resultString) {
+    let result = Number(resultString);
+    result = Math.round(result * Math.pow(10, 8)) / Math.pow(10, 8);
+    return result;
 }
