@@ -30,12 +30,20 @@ const dotButton = document.querySelector('#dot');
 numberButtons.forEach(button => button.addEventListener('click', addToDisplay));
 arithmeticButtons.forEach(button => button.addEventListener('click', addOperator));
 deleteButton.addEventListener('click', deleteFromDisplay);
-equalButton.addEventListener('click', operate);
+equalButton.addEventListener('click', calculate);
 clearButton.addEventListener('click', clearScreen);
 dotButton.addEventListener('click', addDecimal);
 
 function addToDisplay() {
-    displayBottom.innerText += this.innerText;
+    let displayTextBottom = displayBottom.innerText;
+    let regex = new RegExp('[0-9]');
+    let tests = regex.test(displayTextBottom[displayTextBottom.length-1]);
+    let isDot = displayTextBottom[displayTextBottom.length-1] === '.';
+    if (!tests && !isDot) {
+        displayBottom.innerText += ' ' + this.innerText;
+    } else {
+        displayBottom.innerText += this.innerText;
+    }
 }
 
 function deleteFromDisplay() {
@@ -54,9 +62,9 @@ function addOperator() {
     if (lastChar === '+' || lastChar === '-' || lastChar === '/' || lastChar === 'x'){
         deleteFromDisplay();
     }
-    displayBottom.innerText += " " + this.innerText;
-    moveToTop();
-    deacivateButtons();
+    displayBottom.innerText += ' ' + this.innerText;
+    // moveToTop();
+    // deacivateButtons();
 }
 
 function moveToTop() {
@@ -70,33 +78,34 @@ function deacivateButtons() {
 function activateButtons() {
     arithmeticButtons.forEach(button => button.addEventListener('click', addOperator));
 }
-function operate() {
-    let displayTextTop = displayTop.innerText;
-    let firstNumberString = displayTextTop.slice(0, displayTextTop.length - 2);
-    let firstNumber = Number(firstNumberString);
+function operate(operandOne, operator, operandTwo) {
+    // let displayTextTop = displayTop.innerText;
+    // let firstNumberString = displayTextTop.slice(0, displayTextTop.length - 2);
+    // let operandOne =operandTwotNumberString);
 
-    let operator = displayTextTop.slice(displayTextTop.length - 1);
+    // let operator = displayTextTop.slice(displayTextTop.length - 1);
 
-    let secondNumberString = displayBottom.innerText;
-    let secondNumber = Number(secondNumberString);
+    // let secondNumberString = displayBottom.innerText;
+    // let secondNumber = Number(secondNumberString);
 
     let result = 0;
     switch(operator) {
         case '+':
-            result = add(firstNumber, secondNumber);
+            result = add(operandOne, operandTwo);
             break;
         case '-':
-            result = subtract(firstNumber, secondNumber);
+            result = subtract(operandOne, operandTwo);
             break;
         case 'x':
-            result = multiply(firstNumber, secondNumber);
+            result = multiply(operandOne, operandTwo);
             break;
         case '/':
-            result = divide(firstNumber, secondNumber);
+            result = divide(operandOne, operandTwo);
             break;
     }
-    displayResult(result);
-    activateButtons();
+    // displayResult(result);
+    // activateButtons();
+    return result;
 }
 
 function displayResult(result) {
@@ -104,7 +113,7 @@ function displayResult(result) {
         result = roundOff(result);
     }
     displayBottom.innerText = result;
-    displayTop.innerText = result;
+    // displayTop.innerText = result;
 }
 
 function clearScreen() {
@@ -114,9 +123,20 @@ function clearScreen() {
 }
 
 function addDecimal() {
-    let displayTextBottom = displayBottom.innerText;
-    if (displayTextBottom.indexOf('.') === -1) {
-        displayBottom.innerText += '.';
+    // let displayTextBottom = displayBottom.innerText;
+    // if (displayTextBottom.indexOf('.') === -1) {
+    //     if (displayTextBottom === '')
+    //         displayBottom.innerText += '0.';
+    //     else
+    //         displayBottom.innerText += '.';
+    // }
+    let inputArray = Array.from(displayBottom.innerText.split(' '));
+    let lastNumber = inputArray.pop();
+    if (lastNumber.indexOf('.') === -1) {
+        if (lastNumber === '')
+            displayBottom.innerText += '0.';
+        else
+            displayBottom.innerText += '.';
     }
 }
 
@@ -133,4 +153,19 @@ function roundd(resultString) {
     let result = Number(resultString);
     result = Math.round(result * Math.pow(10, 8)) / Math.pow(10, 8);
     return result;
+}
+
+function calculate() {
+    let inputArray = Array.from(displayBottom.innerText.split(' '));
+    let regex = new RegExp('[0-9]');
+    if (!regex.test(inputArray[inputArray.length -1])) {
+        inputArray.pop();
+    }
+    let result = 0;
+    while (inputArray.length > 1) {
+        result = operate(Number(inputArray[0]), inputArray[1], Number(inputArray[2]));
+        inputArray.splice(0, 3, result);
+    }
+    moveToTop();
+    displayResult(inputArray[0]);
 }

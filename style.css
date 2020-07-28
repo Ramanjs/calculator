@@ -23,7 +23,7 @@ body {
 }
 
 #display-top {
-    width: 100%;
+    width: 95%;
     height: 100%;
     grid-area: 1/1/2/5;
     display: flex;
@@ -35,7 +35,7 @@ body {
 }
 
 #display-bottom {
-    width: 100%;
+    width: 95%;
     height: 100%;
     grid-area: 2/1/3/5;
     display: flex;
